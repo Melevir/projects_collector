@@ -21,9 +21,18 @@ logging.getLogger('git').setLevel(logging.INFO)
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser()
     parser.add_argument('search_query', help='Github search query')
-    parser.add_argument('--projects_path', default=DEFAULT_PROJECTS_DIRECTORY, help='path to directory where new projects will be cloned')
+    parser.add_argument(
+        '--projects_path',
+        default=DEFAULT_PROJECTS_DIRECTORY,
+        help='path to directory where new projects will be cloned',
+    )
     parser.add_argument('--projects_amount', type=int, default=10, help='amount of projects to clone')
-    parser.add_argument('--sort_by', default='stars', choices=['stars', 'forks', 'help-wanted-issues', 'updated'], help='field to search projects with')
+    parser.add_argument(
+        '--sort_by',
+        default='stars',
+        choices=['stars', 'forks', 'help-wanted-issues', 'updated'],
+        help='field to search projects with',
+    )
     parser.add_argument('--order', default='desc', choices=['desc', 'asc'], help='order of sorting')
 
     return parser.parse_args()
@@ -56,7 +65,7 @@ def make_github_search_query(
 ) -> List[GithubProjectInfo]:
     projects_info: List[GithubProjectInfo] = []
     for page_num in range(1, pages_amount + 1):
-        current_page_data = requests.get(
+        current_page_data = requests.get(  # type: ignore  # seems like typeshed can't work with Literal
             'https://api.github.com/search/repositories',
             params={
                 'q': search_query,
@@ -67,7 +76,7 @@ def make_github_search_query(
             },
             headers={
                 'Authorization': f'token {GITHUB_API_TOKEN}',
-            }
+            },
         ).json()
         projects_info += current_page_data['items']
     return projects_info
